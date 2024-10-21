@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,6 +13,7 @@ public class Hub {
     private final ExecutorService threadPool;
     HashMap<Integer, Node> routingTable;
     private final ArrayList<Frame> buffer;
+    private int portOffset = 1;
     private final static int MAX_NODE_CONNECTIONS = 1 << 8 - 1; // 255 max node connections
     Hub() {
         // the routing table should be able to resolve a node address with the correct node
@@ -37,7 +37,7 @@ public class Hub {
                     Socket socket = serverSocket.accept();
                     // bring up thread from thread pool to handle request
                     // use private inner class to handle hub routine
-                    threadPool.submit(new HubReceive(socket));
+                    threadPool.submit(new HubConnect(socket));
 
                 }
             } catch (IOException e) {
@@ -46,32 +46,18 @@ public class Hub {
             }
         };
     }
-    private class HubReceive implements Runnable {
+    private class HubConnect implements Runnable {
         private final Socket socket;
-        HubReceive(Socket socket) {
+        HubConnect(Socket socket) {
             this.socket = socket;
         }
-        Optional<Frame> getFrame() {
-            try {
-                InputStream is = this.socket.getInputStream();
-                int destination = is.read();
-                int size = is.read();
-                byte[] data = is.readNBytes(size);
-                Frame frame = new Frame(data, destination, size);
-                buffer.add(frame);
-                return Optional.of(frame);
-            } catch (IOException e) {
-                System.err.println("[ERROR]: Could not decode frame!");
-                return Optional.empty();
-            }
+        // preform connection routine to setup port number for further node communication
+        private void connect() {
 
         }
 
         @Override
         public void run() {
-            // get frame data
-            Optional<Frame> frame = this.getFrame();
-            // send to node via its id
         }
     }
 
