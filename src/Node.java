@@ -4,7 +4,7 @@ import java.util.Optional;
 public class Node {
     // integer id, used by the hub to transmit frames to the node
     Integer ID;
-    private final int portNum;
+    private int nodePortNum;
 
     // assigned port number, obtained during connection via the hub
     // attempt to handle the frame, send the bytes over the
