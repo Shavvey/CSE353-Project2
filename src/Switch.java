@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class Switch {
                 while (true) {
                     // accept a new client request
                     Socket socket = serverSocket.accept();
-                    // bring up thread from thread pool to handle request
+                    // bring up thread from thread pool to handle new node connection
                     // use private inner class to handle hub routine
                     threadPool.submit(new SwitchConnect(socket));
 
@@ -55,6 +56,10 @@ public class Switch {
             try {
                 // try to open input stream, get id of the newly created node
                 InputStream is = socket.getInputStream();
+                int ID = is.read();
+                OutputStream os = socket.getOutputStream();
+                // give a new port num to serve the node connection
+                os.write(ID + SWITCH_PORT);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
